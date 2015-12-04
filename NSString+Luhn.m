@@ -12,33 +12,41 @@
 
 - (BOOL) checkoutBankCodeUseLuhn{
    
-	if(!self){
-	return NO;
-	} 
-    // 先取出来校验位，最后一位
-    NSInteger length = self.length;
-    NSString * luhnString = [self substringFromIndex:length - 1];
-    NSInteger luhnInt = [luhnString integerValue];
-    
-    // 然后从右往左，基数位乘以2，超过10的数字相加替换原数字，ex，12 --> 1 + 2 = 3, 10 --> 1 + 0 = 1
-    NSMutableArray * odds = [NSMutableArray array];// 奇数位的字符
-    NSInteger oddSumInt = 0;// 奇数位的和
-    NSInteger evenSumInt = 0;// 偶数位的和
-    NSInteger index = 1;
-    while (length > 0) {
-        char codeChar = [self characterAtIndex:length - 1];
-        if (index % 2) {// 取出来奇数位的字符
-            [odds addObject:[NSString stringWithFormat:@"%c",codeChar]];
-            int oddCodeInt = [[NSString stringWithFormat:@"%c",codeChar] intValue];
-            oddSumInt += oddCodeInt * 2 % 10 + oddCodeInt * 2 / 10;
-        }else{
-            int evenCodeInt = [[NSString stringWithFormat:@"%c",codeChar] intValue];
-            evenSumInt += evenCodeInt;
+    NSString * cardNum = self;
+    if (cardNum && cardNum.length>15)
+    {
+        int oddsum = 0;     //奇数求和
+        int evensum = 0;    //偶数求和
+        int allsum = 0;
+        int cardNoLength = (int)[cardNum length];
+        int lastNum = [[cardNum substringFromIndex:cardNoLength-1] intValue];
+        
+        cardNum = [cardNum substringToIndex:cardNoLength - 1];
+        for (int i = cardNoLength -1 ; i>=1;i--) {
+            NSString *tmpString = [cardNum substringWithRange:NSMakeRange(i-1, 1)];
+            int tmpVal = [tmpString intValue];
+            if (cardNoLength % 2 ==1 ) {
+                if((i % 2) == 0){
+                    tmpVal *= 2;
+                    evensum += (tmpVal / 10 + tmpVal % 10);
+                }else{
+                    oddsum += tmpVal;
+                }
+            }else{
+                if((i % 2) == 1){
+                    tmpVal *= 2;
+                    evensum += (tmpVal / 10 + tmpVal % 10);
+                }else{
+                    oddsum += tmpVal;
+                }
+            }
         }
-        length -= 1;
-        index += 1;
-    };
-    return (oddSumInt + evenSumInt + luhnInt) % 10;
+        
+        allsum = oddsum + evensum;
+        allsum += lastNum;
+        return (allsum % 10) == 0;
+    }
+    return NO;
 }
 
 @end
