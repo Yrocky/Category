@@ -11,7 +11,10 @@
 @implementation NSString (Luhn)
 
 - (BOOL) checkoutBankCodeUseLuhn{
-    
+   
+	if(!self){
+	return NO;
+	} 
     // 先取出来校验位，最后一位
     NSInteger length = self.length;
     NSString * luhnString = [self substringFromIndex:length - 1];
